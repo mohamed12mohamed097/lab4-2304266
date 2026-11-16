@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+  .lib-nav a { margin-right: .8rem; }
+  .lib-table { border-collapse: collapse; width: 100%; margin: .5rem 0 1rem; }
+  .lib-table th, .lib-table td { border: 1px solid #8884; padding: .4rem .6rem; text-align: left; }
+  .lib-scroll { overflow-x: auto; }
+  .lib-error { color: #b00020; }
+</style>
+
+<p class="lib-nav">
+  <a href="/library">Library</a>
+  <a href="/library/search">Search</a>
+  <a href="/library/page/F2.2">Catalogue</a>
+  <a href="/library/page/F2.3">Reports</a>
+  <a href="/library/page/F2.4">Loans</a>
+  <a href="/library/page/F2.5">Most borrowed</a>
+  <a href="/library/page/F2.6">Authors and books</a>
+</p>
+
+<h1>F2.1 Search books</h1>
+
+<form method="get" action="/library/search">
+  <p><label>Title keyword<br><input name="title" value="{{ form.title }}"></label></p>
+  <p><label>Minimum price<br><input name="min_price" type="number" step="0.01" min="0" value="{{ form.min_price }}"></label></p>
+  <p><label>Maximum price<br><input name="max_price" type="number" step="0.01" min="0" value="{{ form.max_price }}"></label></p>
+  <p><label>Category<br>
+    <select name="category">
+      <option value="">All categories</option>
+      {% for c in categories %}
+      <option value="{{ c.category_id }}" {% if form.category == c.category_id|string %}selected{% endif %}>{{ c.name }}</option>
+      {% endfor %}
+    </select>
+  </label></p>
+  <button type="submit">Search</button>
+</form>
+
+{% if error %}<p class="lib-error">{{ error }}</p>{% endif %}
+
+{% if books is not none %}
+  <h3>Results (cheapest first)</h3>
+  {% if books %}
+  <div class="lib-scroll">
+    <table class="lib-table">
+      <tr><th>ID</th><th>Title</th><th>Price</th><th>Year</th><th>Category</th></tr>
+      {% for b in books %}
+      <tr>
+        <td>{{ b.book_id }}</td><td>{{ b.title }}</td><td>{{ b.price }}</td>
+        <td>{{ b.publish_year if b.publish_year is not none else '' }}</td><td>{{ b.category }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+  <p>No books match your search.</p>
+  {% endif %}
+{% endif %}
+{% endblock %}
